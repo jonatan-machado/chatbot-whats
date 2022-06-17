@@ -1,4 +1,5 @@
 import express,{Request, Response} from 'express'
+import { fileURLToPath } from 'url'
 import Sender from './sender'
 
 const sender = new Sender()
@@ -11,18 +12,15 @@ app.use(express.urlencoded({extended:false}))
 app.get('/status',(req:Request, res:Response)=> {
   return res.send({
     qr_code: sender.qrCode,
-    connected: sender.isConnected
+    connected: sender.isConnected,
   })
 })
 
 app.post('/send', async(req:Request, res:Response)=>{
-  const {number, message} = req.body
-
+  const {message, img,nameImg} = req.body
   try {
     //validar e transformar o numero do wpp
-
-
-    await sender.sendText(number,message)
+    await sender.sendText(img,nameImg,message)
 
     return res.status(200).json()
   } catch (error) {
