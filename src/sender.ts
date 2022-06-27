@@ -34,9 +34,7 @@ class Sender {
       .fromFile(filePath)
       .then((lista) => {
         for (const number of lista) {
-          // if(!isValidPhoneNumber(number.telefone, "BR")){
-          //   throw new Error("this number is not valid!")
-          // }
+
           let phoneNumber = parsePhoneNumber(number.telefone, 'BR')
             ?.format('E.164')
             .replace('+', '') as string;
@@ -54,14 +52,18 @@ class Sender {
     console.log('numeros dos contatos', contac);
     let counter = 0;
     let i = setInterval(async()=>{
-       await this.sendMessage(contac[counter], img, nameImg, body)
+       await this.sendMessage(contac[counter], img, nameImg, body).then().catch(
+       (err)=>{
+        console.log(err)
+       }
+       )
        console.log('mensagem enviada',contac[counter])
       counter++
       if(counter>=contac.length){
         console.log('ACABOU!')
         clearInterval(i)
       }
-    },15000)
+    },5000)
     this.client.onMessage(async (message:any)=>{
       if(String(message.body).toUpperCase() === 'MAIS DADOS'){
         let data = {
