@@ -29,6 +29,6 @@ app.post('/send', async(req:Request, res:Response)=>{
   }
 })
 
-app.listen(3333,()=>{
+app.listen(3332,()=>{
   console.log('server started')
 })

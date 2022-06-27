@@ -2,6 +2,7 @@ import parsePhoneNumber, {
   isValidPhoneNumber,
   PhoneNumber,
 } from 'libphonenumber-js';
+import {saveLead} from './bot'
 import { create, Whatsapp, Message, SocketState } from 'venom-bot';
 import csv from 'csvtojson';
 
@@ -51,8 +52,6 @@ class Sender {
   async sendText(img: string, nameImg: string, body: string) {
     const contac:[] = await this.extractContact();
     console.log('numeros dos contatos', contac);
-
-
     let counter = 0;
     let i = setInterval(async()=>{
        await this.sendMessage(contac[counter], img, nameImg, body)
@@ -63,6 +62,15 @@ class Sender {
         clearInterval(i)
       }
     },15000)
+    this.client.onMessage(async (message:any)=>{
+      if(String(message.body).toUpperCase() === 'MAIS DADOS'){
+        let data = {
+          phone:message.to
+          
+        }
+        saveLead(data)
+      }
+    })
   }
 
   async sendMessage(contact:string,img:string,nameImg:string, body:string){
