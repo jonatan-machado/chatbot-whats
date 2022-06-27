@@ -1,3 +1,4 @@
+import { PhoneNumber } from 'libphonenumber-js';
 import { create,Whatsapp } from 'venom-bot';
 import api from "./api"
 create({session:'ola',multidevice:true})
@@ -7,11 +8,12 @@ create({session:'ola',multidevice:true})
   });
 
   const dataLead = async (phone:any) =>{
-    console.log(phone)
+    console.log('telefone enviado',phone)
+    const body:any = {phone:phone}
     try {
-      const response = await api.get("leads/bots",phone)
+      const response = await api.post("leads/bots",body)
+      console.log(body.phone)
       console.log('GET DADOS', response.data.newLead)
-      
     } catch (error) {
       console.log('erro',error)
       
@@ -25,34 +27,30 @@ create({session:'ola',multidevice:true})
     let price:number = 0
     let dormitorio:string = ''
      client.onMessage( async (message:any) => {
-        let phone = message.to
-        const lead:[] =[]
-       let leadData = await dataLead({phone})
-        
-        console.log('dados',phone)
-  
-
-        if(lead.length === null){
-          data = {
-            amount_invest:price,
-            dormitory:dormitorio,
-            localization:localization,
-            phone:message.to,
-            email:"jonatan.machado1@hotmail.com",
-            name:"paulo roberto",
-            stage:stage,
-            id_user:"d896af2c-6c51-46de-b60a-711bf3fb33b0"
-          }
-          await saveLead(data)
+      if(String(message.body) !== ''){
+        let client = message.from
+        const response = await dataLead(client)
+       if(response === undefined){
+        const data = {
+          name:"sem nome",
+          email:"sem email",
+          phone:message.to,
+          localization:"menino deus",
+          amount_invest:"900 mil",
+          dormitory:"2 quartos",
+          stage:0,
+          phoneAtendent:client
         }
-        await ServiceBot({client,message,lead})
-        console.log(data)
+        saveLead(data)
+       }
+
+      }
     });
   }
 
   const saveLead = async (data:any) =>{
     try {
-      //await api.post("leads",data)
+      await api.post("leads",data)
       console.log('SAVE')
       
     } catch (error) {
@@ -72,10 +70,8 @@ create({session:'ola',multidevice:true})
     }
   }
 
-  
-
-  const ServiceBot = async ({client,message,data}:any) => {
-    let {localization,dormitorio,price,stage,phone,email,name,id_user} = data
+/* const ServiceBot = async ({client,message,data}:any) => {
+    let {localization,dormitorio,price,stage,phone,email,name,id_user,phoneAtendent} = data
     if(String(message.body).toUpperCase() === 'SAIR' 
         || String(message.body).toUpperCase() === 'PARAR' 
         || String(message.body).toUpperCase() === 'STOP'){
@@ -128,6 +124,6 @@ create({session:'ola',multidevice:true})
          updateLead(data)
           return
         }
-  }
+} */
 
   export default start
