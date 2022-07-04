@@ -5,6 +5,7 @@ import parsePhoneNumber, {
 import {saveLead} from './bot'
 import { create, Whatsapp, Message, SocketState } from 'venom-bot';
 import csv from 'csvtojson';
+import api from './api';
 
 export type QRCode = {
   base64Qr: string;
@@ -63,7 +64,7 @@ class Sender {
         console.log('ACABOU!')
         clearInterval(i)
       }
-    },5000)
+    },10000)
     this.client.onMessage(async (message:any)=>{
       if(String(message.body).toUpperCase() === 'MAIS DADOS'){
         let data = {
@@ -82,13 +83,15 @@ class Sender {
   private initialize() {
     const qr = (base64Qr: string) => {
       this.qr = { base64Qr };
+      SocketState.CONNECTED
+
     };
     const start = (client: Whatsapp) => {
       this.client = client;
-
       client.onStateChange((state) => {
-        this.connected = state === SocketState.CONNECTED;
-      });
+        return this.connected = state === SocketState.CONNECTED;
+       });
+     
     };
 
     create('ws-sender-dev', qr)
